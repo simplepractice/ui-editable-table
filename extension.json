@@ -1,6 +1,6 @@
 {
-  "name": "Contentful UI extension table example",
-  "id": "cf-contentful-ui-table-example",
+  "name": "Contentful Table UI",
+  "id": "contentful-table-ui",
   "fieldTypes": ["Object"],
   "srcdoc": "./index.html"
 }

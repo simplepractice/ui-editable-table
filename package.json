@@ -1,7 +1,7 @@
 {
-  "name": "cf-contentful-ui-country-select",
+  "name": "contentful-table-ui",
   "version": "1.0.0",
-  "description": "Contentful UI extension to easily select countries",
+  "description": "Contentful UI Extension to display JSON as Tables",
   "main": "index.js",
   "engines": {
     "node": ">=7.6"
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stefanjudis/contentful-ui-country-select.git"
+    "url": "git+https://github.com/ljvmiranda921/ui-editable-table.git"
   },
   "keywords": [
     "contentful"
@@ -20,9 +20,9 @@
   "author": "stefan judis <stefanjudis@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stefanjudis/contentful-ui-country-select/issues"
+    "url": "https://github.com/ljvmiranda921/ui-editable-table/issues"
   },
-  "homepage": "https://github.com/stefanjudis/contentful-ui-country-select#readme",
+  "homepage": "https://github.com/ljvmiranda921/ui-editable-table#readme",
   "devDependencies": {
     "contentful-extension-cli": "^2.0.0"
   }

@@ -4,20 +4,10 @@ An editable table to handle tabular data as a [Contentful UI Extension](https://
 
 ![figure](https://raw.githubusercontent.com/contentful-developer-relations/ui-editable-table/master/demo.gif "Editable table as Contentful UI Extension demo")
 
-## Note
-
-This is a fork of the original [Contentful Table UI
-Extension](https://github.com/contentful-labs/ui-editable-table) from
-Contentful Labs. It includes a few changes:
-* Merges @dmcb's [Pull Request](https://github.com/contentful-labs/ui-editable-table/pull/2) that adds controls to alter table dimensions.
-* Uses the modern [contentful extension CLI](https://github.com/contentful/contentful-cli/tree/master/docs/extension). The [previous one](https://github.com/contentful/contentful-extension-cli) is already deprecated.
-* Allows input of the Environment ID via the `CONTENTFUL_ENVIRONMENT`
-    environment variable.
-
 ## Installation
 
 ```sh
-git clone git@github.com:ljvmiranda921/ui-editable-table.git
+git clone git@github.com:simplepractice/ui-editable-table.git
 cd ui-editable-table
 npm install
 ```

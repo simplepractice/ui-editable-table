@@ -9,17 +9,21 @@
       select {
         margin-bottom: 1em;
       }
-      
-      input {
-          border: none;
-          width: 100%;
-          font-size: 14px;
-          padding: 2px;
-          text-align: center;
+
+      select:first-of-type {
+        margin-right: 8px;
       }
 
-      input:hover { background-color: #eee; }
-      input:focus { background-color: #ccf; }
+      td input {
+        border: none;
+        width: 100%;
+        font-size: 14px;
+        padding: 4px;
+        text-align: center;
+      }
+
+      td input:hover { background-color: #eee; }
+      td input:focus { background-color: #ccf; }
 
       table {
         border-collapse: collapse;
@@ -27,28 +31,59 @@
       }
 
       td {
-          border: 1px solid #999;
-          padding: 0;
+        border: 1px solid #999;
+        padding: 0;
+        min-width: 340px;
       }
 
       tr:first-child td input {
-          background-color: #ccc;
-          font-weight: bold;
-          text-align: center;
-          user-select: none;
+        background-color: #ccc;
+        font-weight: bold;
+        text-align: center;
+        user-select: none;
+      }
+
+      #columns-config-container {
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .radio-group-container,
+      .radio-container,
+      .group-container {
+        display: flex;
+      }
+
+      .radio-group-container {
+        min-width: 340px;
+      }
+
+      .group-container {
+        margin-left: 4px;
+      }
+
+      .alignment-info {
+        margin-top: 0;
+        margin-bottom: 4px;
       }
     </style>
   </head>
   <body>
     <div id="content">
+      <div id="columns-config-container"></div>
       <table></table>
     </div>
     <script>
+      const TABLE_ALIGNMENTS = {
+        AUTO: 'auto',
+        LEFT: 'left',
+        CENTER: 'center',
+        RIGHT: 'right'
+      };
+      const UPDATE_HEIGHT_OFFSET = 40;
+
       function getInitialData({rows, header}) {
-        const data = [
-          header
-        ];
-        const columns = data[0].length;
+        const data = [header];
 
         for (let i = 0; i < rows; i++) {
           data.push(new Array(data[0].length));
@@ -56,40 +91,124 @@
 
         return data;
       }
-      
-      function alterData(data) {
-        if (document.querySelector('#rows').value < data.length) {
-      		data.length = document.querySelector('#rows').value;
-        }
-        else {
-          for (let i = data.length; i < document.querySelector('#rows').value; i++) {
-            data.push(new Array());
+
+      function updateColumnAlignments(currentAlignments) {
+        let mewAlignments = [...currentAlignments];
+
+        if (document.querySelector('#columns').value < currentAlignments.length) {
+          mewAlignments.length = document.querySelector('#columns').value;
+        } else {
+          for (let i = currentAlignments.length; i < document.querySelector('#columns').value; i++) {
+            mewAlignments.push(TABLE_ALIGNMENTS.AUTO);
           }
         }
-        
+
+        return mewAlignments;
+      }
+
+      function alterData(data) {
+        if (document.querySelector('#rows').value < data.length) {
+          data.length = document.querySelector('#rows').value;
+        } else {
+          for (let i = data.length; i < document.querySelector('#rows').value; i++) {
+            data.push([]);
+          }
+        }
+
         for (let i = 0; i < data.length; i++) {
           if (document.querySelector('#columns').value < data[i].length) {
             data[i].length = document.querySelector('#columns').value;
-          }
-          else {
+          } else {
             for (let j = data[i].length; j < document.querySelector('#columns').value; j++) {
-              data[i].push('');
+              data[i].push(i === 0 ? `Header ${j + 1}` : '');
             }
           }
         }
-        
+
         return data;
       }
 
-      function createDOMTable(elem, tableData) {
-        while(elem.rows.length > 0) {
-          elem.deleteRow(0);
+      function getAlignmentOptions(columnIndex, selected) {
+        return `
+              <p class="alignment-info">Alignment:</p>
+
+              <div class="group-container">
+                <div class="radio-container">
+                  <input
+                    type="radio"
+                    id="auto-column-${columnIndex}"
+                    name="alignment-column-${columnIndex}"
+                    value="auto"
+                    data-column=${columnIndex}
+                    ${selected === 'auto' ? 'checked' : ''}
+                  >
+                  <label for="left-column-${columnIndex}">Auto</label>
+                </div>
+
+                <div class="radio-container">
+                  <input
+                    type="radio"
+                    id="left-column-${columnIndex}"
+                    name="alignment-column-${columnIndex}"
+                    value="left"
+                    data-column=${columnIndex}
+                    ${selected === 'left' ? 'checked' : ''}
+                  >
+                  <label for="left-column-${columnIndex}">Left</label>
+                </div>
+
+                <div class="radio-container">
+                  <input
+                    type="radio"
+                    id="center-column-${columnIndex}"
+                    name="alignment-column-${columnIndex}"
+                    value="center"
+                    data-column=${columnIndex}
+                    ${selected === 'center' ? 'checked' : ''}
+                  >
+                  <label for="center-column-${columnIndex}">Center</label>
+                </div>
+
+                <div class="radio-container">
+                  <input
+                    type="radio"
+                    id="right-column-${columnIndex}"
+                    name="alignment-column-${columnIndex}"
+                    value="right"
+                    data-column=${columnIndex}
+                    ${selected === 'right' ? 'checked' : ''}
+                  >
+                  <label for="right-column-${columnIndex}">Right</label>
+                </div>
+              </div>
+            `;
+      }
+
+      function createColumnAlignmentItems(columnsAlignments) {
+        let containerElement = document.getElementById('columns-config-container');
+        containerElement.innerHTML = "";
+
+        columnsAlignments.forEach((columnAlignment, index) => {
+          let radioGroupContainer = document.createElement('div');
+
+          radioGroupContainer.setAttribute('data-column', index);
+          radioGroupContainer.setAttribute('class', 'radio-group-container');
+
+          radioGroupContainer.innerHTML = getAlignmentOptions(index, columnAlignment)
+          containerElement.appendChild(radioGroupContainer);
+        });
+      }
+
+      function createDOMTable(tableElement, tableData) {
+        while (tableElement.rows.length > 0) {
+          tableElement.deleteRow(0);
         }
 
         for (let i = 0; i < tableData.length; i++) {
-          let row = elem.insertRow();
+          let row = tableElement.insertRow();
+          let columnsQty = tableData[0].length;
 
-          for (let j = 0; j < tableData[0].length; j++) {
+          for (let j = 0; j < columnsQty; j++) {
             row.insertCell().innerHTML = `<input data-row="${i}" data-column="${j}" value="${tableData[i][j] || ''}"/>`;
           }
         }
@@ -100,46 +219,64 @@
 
         if (!value) {
           value = {
+            columnsAlignments: [TABLE_ALIGNMENTS.AUTO, TABLE_ALIGNMENTS.AUTO],
             tableData : getInitialData({
               rows: 2,
-              header: ['FOO', 'BAR']
+              header: ['Header 1', 'Header 2']
             })
           };
         }
 
-       createDOMTable(document.querySelector('table'), value.tableData);
-        
+        if (!value.columnsAlignments) {
+          value.columnsAlignments = value.tableData[0].map(() => TABLE_ALIGNMENTS.AUTO)
+        }
+
+        createColumnAlignmentItems(value.columnsAlignments);
+        createDOMTable(document.querySelector('table'), value.tableData);
+
         let selectTypes = ['rows', 'columns'];
-        for (selectType in selectTypes) { 
+        for (let selectType in selectTypes) {
           let selectElement = document.createElement('select');
           selectElement.id = selectTypes[selectType];
-          for (var i = 1; i<=100; i++){
-            var opt = document.createElement('option');
-            opt.value = i;
+
+          for (let i = 0; i <= 100; i++) {
+            let opt = document.createElement('option');
+            opt.value = `${i}`;
             opt.innerHTML = i + ' ' + selectElement.id;
             selectElement.appendChild(opt);
-          }
-          if (selectTypes[selectType] == 'rows') {
+          } if (selectTypes[selectType] === 'rows') {
             selectElement.value = value.tableData.length;
-          }
-          else {
+          } else {
             selectElement.value = value.tableData[0].length;
           }
-          selectElement.addEventListener('change', e => {
-            value = { 
+
+          selectElement.addEventListener('change', () => {
+            value = {
+              columnsAlignments: updateColumnAlignments(value.columnsAlignments),
               tableData : alterData(value.tableData)
             };
+
+            createColumnAlignmentItems(value.columnsAlignments);
             createDOMTable(document.querySelector('table'), value.tableData);
-            extension.window.updateHeight();
             extension.field.setValue(value);
+            extension.window.updateHeight(document.body.scrollHeight + UPDATE_HEIGHT_OFFSET);
           }, true);
+
           document.body.insertBefore(selectElement, document.body.childNodes[0]);
-          extension.window.updateHeight();
+          extension.window.updateHeight(document.body.scrollHeight + UPDATE_HEIGHT_OFFSET);
         }
 
         window.addEventListener('blur', e => {
-          value.tableData[e.target.dataset.row][e.target.dataset.column] = e.target.value;
-          extension.field.setValue(value);
+          if (e.constructor.name === 'FocusEvent') {
+            if (e.target.type === 'radio') {
+              value.columnsAlignments[e.target.dataset.column] = e.target.value;
+            } else {
+              value.tableData[e.target.dataset.row][e.target.dataset.column] = e.target.value;
+            }
+
+            extension.field.setValue(value);
+            extension.window.updateHeight(document.body.scrollHeight + UPDATE_HEIGHT_OFFSET);
+          }
         }, true);
       });
     </script>

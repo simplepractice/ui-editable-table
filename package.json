@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/ljvmiranda921/ui-editable-table#readme",
   "dependencies": {
-    "contentful-cli": "^1.5.37"
+    "contentful-cli": "^1.12.33"
   }
 }
